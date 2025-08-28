@@ -155,32 +155,23 @@
     timers[idx] = 0;
     updateDisplay(index);
   };
-
-  // Attach hold (press-and-hold) handlers for +/- using pointer events.
-  // We remove inline onclick on plus/minus to avoid double-calls.
   document.querySelectorAll('.timer').forEach((timerEl, i) => {
     const idx = i + 1;
-    // controls layout expected: [ -, Start, + ]
     const btns = timerEl.querySelectorAll('.controls button');
     if (!btns || btns.length < 3) return;
     const minusBtn = btns[0];
     const startBtn = btns[1];
     const plusBtn = btns[2];
-    // Remove any inline onclick on +/- to avoid duplicate calls (safe even if absent)
     minusBtn.removeAttribute('onclick');
     minusBtn.onclick = null;
     plusBtn.removeAttribute('onclick');
     plusBtn.onclick = null;
 
     function beginHold(amount) {
-      // immediate one-step change (gives instant feedback)
       changeTime(idx, amount);
-      // clear previous if any
       if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
-      // start repeating
       holdIntervals[i] = setInterval(() => changeTime(idx, amount), 150);
 
-      // ensure release anywhere stops it
       const stopHandler = () => {
         if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
         window.removeEventListener('pointerup', stopHandler);
@@ -189,27 +180,20 @@
       window.addEventListener('pointerup', stopHandler);
       window.addEventListener('pointercancel', stopHandler);
     }
-
-    // pointerdown is better than mousedown/touchstart because it unifies both
-    minusBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); beginHold(-10); });
-    plusBtn.addEventListener('pointerdown',  (e) => { e.preventDefault(); beginHold(10); });
-
-    // also stop if pointer leaves the button quickly (safety)
+    minusBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); beginHold(-30); });
+    plusBtn.addEventListener('pointerdown',  (e) => { e.preventDefault(); beginHold(30); });
     minusBtn.addEventListener('pointerleave', () => {
       if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
     });
     plusBtn.addEventListener('pointerleave', () => {
       if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
     });
-
-    // Ensure display shows initial 00:00
     updateDisplay(idx);
   });
-
-  // initialize displays (in case)
   updateDisplay(1); updateDisplay(2); updateDisplay(3);
 })();
 </script>
 </body>
 </html>
+
 
