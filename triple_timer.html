@@ -72,9 +72,9 @@
         <input type="text" placeholder="Timer 1">
         <div class="time-display" id="time1">00:00</div>
         <div class="controls">
-            <button onmousedown="startChanging(1, -10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">-</button>
+            <button>-</button>
             <button onclick="startTimer(1)">Start</button>
-            <button onmousedown="startChanging(1, 10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">+</button>
+            <button>+</button>
         </div>
         <button class="cancel-btn" onclick="resetTimer(1)">Cancel</button>
     </div>
@@ -82,9 +82,9 @@
         <input type="text" placeholder="Timer 2">
         <div class="time-display" id="time2">00:00</div>
         <div class="controls">
-            <button onmousedown="startChanging(2, -10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">-</button>
+            <button>-</button>
             <button onclick="startTimer(2)">Start</button>
-            <button onmousedown="startChanging(2, 10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">+</button>
+            <button>+</button>
         </div>
         <button class="cancel-btn" onclick="resetTimer(2)">Cancel</button>
     </div>
@@ -92,108 +92,96 @@
         <input type="text" placeholder="Timer 3">
         <div class="time-display" id="time3">00:00</div>
         <div class="controls">
-            <button onmousedown="startChanging(3, -10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">-</button>
+            <button>-</button>
             <button onclick="startTimer(3)">Start</button>
-            <button onmousedown="startChanging(3, 10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">+</button>
+            <button>+</button>
         </div>
         <button class="cancel-btn" onclick="resetTimer(3)">Cancel</button>
     </div>
 </div>
+
 <script>
 (function() {
-  // state
-  const timers = [0, 0, 0];          // seconds for each timer
-  const countdowns = [null, null, null]; // countdown intervals
-  const holdIntervals = [null, null, null]; // hold intervals for +/- buttons
+  const timers = [0,0,0];          // seconds for each timer
+  const countdowns = [null,null,null];
+  const holdIntervals = [null,null,null];
 
   function formatTime(t) {
-    const m = Math.floor(t / 60);
-    const s = t % 60;
+    const m = Math.floor(t/60);
+    const s = t%60;
     return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   }
 
-  // update display for index (1-based)
   window.updateDisplay = function(index) {
-    const elById = document.getElementById('time' + index);
-    let el = elById;
-    if (!el) {
-      const timersEls = document.querySelectorAll('.timer');
-      el = timersEls[index - 1] && timersEls[index - 1].querySelector('.time-display');
-    }
-    if (el) el.textContent = formatTime(timers[index - 1]);
-  };
+    const el = document.getElementById('time' + index);
+    if(el) el.textContent = formatTime(timers[index-1]);
+  }
 
-  // safe global functions (used by inline onclicks like Start / Cancel)
   window.changeTime = function(index, amount) {
-    timers[index - 1] = Math.max(0, timers[index - 1] + amount);
+    timers[index-1] = Math.max(0, timers[index-1] + amount);
     updateDisplay(index);
-  };
+  }
 
   window.startTimer = function(index) {
-    const idx = index - 1;
-    if (countdowns[idx]) return; // already running
-    if (timers[idx] <= 0) return; // nothing to run
-    countdowns[idx] = setInterval(() => {
-      if (timers[idx] > 0) {
+    const idx = index-1;
+    if(countdowns[idx] || timers[idx]<=0) return;
+    countdowns[idx] = setInterval(()=>{
+      if(timers[idx]>0){
         timers[idx]--;
         updateDisplay(index);
       }
-      if (timers[idx] <= 0) {
+      if(timers[idx]<=0){
         clearInterval(countdowns[idx]);
-        countdowns[idx] = null;
-        // use the input name if present
+        countdowns[idx]=null;
         const nameInput = document.querySelectorAll('.timer input')[idx];
         const name = (nameInput && nameInput.value.trim()) || `Timer ${index}`;
-        try { alert(`${name} finished!`); } catch (e) { /* ignore */ }
+        try{ alert(`${name} finished!`);}catch(e){}
       }
-    }, 1000);
-  };
+    },1000);
+  }
 
   window.resetTimer = function(index) {
-    const idx = index - 1;
-    if (countdowns[idx]) { clearInterval(countdowns[idx]); countdowns[idx] = null; }
-    timers[idx] = 0;
+    const idx = index-1;
+    if(countdowns[idx]) { clearInterval(countdowns[idx]); countdowns[idx]=null; }
+    timers[idx]=0;
     updateDisplay(index);
-  };
-  document.querySelectorAll('.timer').forEach((timerEl, i) => {
-    const idx = i + 1;
+  }
+
+  document.querySelectorAll('.timer').forEach((timerEl,i)=>{
+    const idx = i+1;
     const btns = timerEl.querySelectorAll('.controls button');
-    if (!btns || btns.length < 3) return;
+    if(!btns || btns.length<3) return;
     const minusBtn = btns[0];
-    const startBtn = btns[1];
     const plusBtn = btns[2];
+
+    // прибираємо старі onclick
     minusBtn.removeAttribute('onclick');
-    minusBtn.onclick = null;
     plusBtn.removeAttribute('onclick');
-    plusBtn.onclick = null;
 
-    function beginHold(amount) {
-      changeTime(idx, amount);
-      if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
-      holdIntervals[i] = setInterval(() => changeTime(idx, amount), 150);
-
-      const stopHandler = () => {
-        if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
+    function beginHold(amount){
+      changeTime(idx,amount); // одразу один крок
+      if(holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i]=null; }
+      holdIntervals[i] = setInterval(()=>changeTime(idx,amount),150);
+      const stopHandler = ()=>{
+        if(holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i]=null; }
         window.removeEventListener('pointerup', stopHandler);
         window.removeEventListener('pointercancel', stopHandler);
-      };
+      }
       window.addEventListener('pointerup', stopHandler);
       window.addEventListener('pointercancel', stopHandler);
     }
-    minusBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); beginHold(-30); });
-    plusBtn.addEventListener('pointerdown',  (e) => { e.preventDefault(); beginHold(30); });
-    minusBtn.addEventListener('pointerleave', () => {
-      if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
-    });
-    plusBtn.addEventListener('pointerleave', () => {
-      if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
-    });
+
+    minusBtn.addEventListener('pointerdown', e=>{ e.preventDefault(); beginHold(-30); });
+    plusBtn.addEventListener('pointerdown', e=>{ e.preventDefault(); beginHold(30); });
+
+    // одиночний клік теж додає/віднімає 30 секунд
+    minusBtn.addEventListener('click', ()=>changeTime(idx,-30));
+    plusBtn.addEventListener('click', ()=>changeTime(idx,30));
+
     updateDisplay(idx);
   });
-  updateDisplay(1); updateDisplay(2); updateDisplay(3);
+
 })();
 </script>
 </body>
 </html>
-
-
