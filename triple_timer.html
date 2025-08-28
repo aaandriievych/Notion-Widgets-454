@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multiple Timers</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #fafafa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 30px;
+        padding: 40px;
+    }
+
+    .timer {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        text-align: center;
+        width: 400px;
+    }
+
+    .time-display {
+        font-size: 64px;
+        margin-bottom: 25px;
+        font-weight: bold;
+    }
+
+    .controls {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    button {
+        font-size: 22px;
+        padding: 15px 28px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        background-color: #333;
+        color: white;
+        transition: background 0.3s;
+    }
+
+    button:hover {
+        background-color: #555;
+    }
+
+    .plus, .minus {
+        background-color: #007bff;
+    }
+
+    .plus:hover, .minus:hover {
+        background-color: #0056b3;
+    }
+</style>
+</head>
+<body>
+    <div class="timer">
+        <div class="time-display">00:00</div>
+        <div class="controls">
+            <button class="minus">-</button>
+            <button class="plus">+</button>
+            <button class="start">Start</button>
+            <button class="stop">Stop</button>
+            <button class="reset">Reset</button>
+        </div>
+    </div>
+
+    <div class="timer">
+        <div class="time-display">00:00</div>
+        <div class="controls">
+            <button class="minus">-</button>
+            <button class="plus">+</button>
+            <button class="start">Start</button>
+            <button class="stop">Stop</button>
+            <button class="reset">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.timer').forEach(timer => {
+            let intervalId;
+            const timeDisplay = timer.querySelector('.time-display');
+            const startBtn = timer.querySelector('.start');
+            const stopBtn = timer.querySelector('.stop');
+            const resetBtn = timer.querySelector('.reset');
+            const plusBtn = timer.querySelector('.plus');
+            const minusBtn = timer.querySelector('.minus');
+            let time = 0;
+            let countdown;
+            let running = false;
+
+            function updateDisplay() {
+                const minutes = Math.floor(time / 60);
+                const seconds = time % 60;
+                timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            function changeTime(amount) {
+                time = Math.max(0, time + amount);
+                updateDisplay();
+            }
+
+            function startChange(amount) {
+                changeTime(amount);
+                intervalId = setInterval(() => changeTime(amount), 150);
+            }
+
+            function stopChange() {
+                clearInterval(intervalId);
+            }
+
+            // Hold to increase/decrease
+            plusBtn.addEventListener('mousedown', () => startChange(10));
+            plusBtn.addEventListener('mouseup', stopChange);
+            plusBtn.addEventListener('mouseleave', stopChange);
+
+            minusBtn.addEventListener('mousedown', () => startChange(-10));
+            minusBtn.addEventListener('mouseup', stopChange);
+            minusBtn.addEventListener('mouseleave', stopChange);
+
+            // Mobile touch support
+            plusBtn.addEventListener('touchstart', e => { e.preventDefault(); startChange(10); });
+            plusBtn.addEventListener('touchend', stopChange);
+
+            minusBtn.addEventListener('touchstart', e => { e.preventDefault(); startChange(-10); });
+            minusBtn.addEventListener('touchend', stopChange);
+
+            // Start/Stop/Reset
+            startBtn.addEventListener('click', () => {
+                if (!running && time > 0) {
+                    running = true;
+                    countdown = setInterval(() => {
+                        time--;
+                        updateDisplay();
+                        if (time <= 0) {
+                            clearInterval(countdown);
+                            running = false;
+                        }
+                    }, 1000);
+                }
+            });
+
+            stopBtn.addEventListener('click', () => {
+                clearInterval(countdown);
+                running = false;
+            });
+
+            resetBtn.addEventListener('click', () => {
+                clearInterval(countdown);
+                running = false;
+                time = 0;
+                updateDisplay();
+            });
+
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>
