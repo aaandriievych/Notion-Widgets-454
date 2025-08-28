@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      .converter-box {
+        line-height: 1.2;
+        text-align: center;
+        position: relative;
+        padding: 20px 16px 24px;
+        background-color: #fff7d1;
+        width: 618px;
+        border-radius: 10px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        margin: auto;
+      }
+
+      .selector {
+        background-color: #fff;
+        border: 1px solid #dadce0;
+        color: #000;
+        font-size: 120%;
+        height: 40px;
+        padding: 4px 10px;
+        text-align: center;
+        width: 197px;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: 0.2s;
+        margin-bottom: 8px;
+      }
+      .selector:focus {
+        outline: none;
+        border-color: #f5b400;
+        box-shadow: 0 0 5px rgba(245,180,0,0.5);
+      }
+
+      .unit {
+        font-family: Arial, sans-serif;
+        border-radius: 6px;
+        color: #000;
+        width: 211px;
+      }
+
+      .convert {
+        font-family: Roboto,arial,sans-serif;
+        color: #000;
+        width: 449px;
+        margin-bottom: 20px;
+        border-radius: 6px;
+      }
+
+      .sel {
+        text-align-last: center !important;
+        font-family: Roboto,arial,sans-serif;
+        background: #fff url(http://ssl.gstatic.com/ui/v1/disclosure/grey-disclosure-arrow-up-down.png) 98% no-repeat;
+        border: 1px solid #dadce0;
+        font-size: 13px;
+        line-height: 20px;
+        padding: 6px 12px;
+        vertical-align: middle;
+        -webkit-appearance: none;
+        appearance: none;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: 0.2s;
+      }
+      .sel:focus {
+        outline: none;
+        border-color: #f5b400;
+        box-shadow: 0 0 5px rgba(245,180,0,0.5);
+      }
+.equals {
+  font-family: Roboto, arial, sans-serif;
+  font-size: 28px;
+  color: #70757a;
+  line-height: 60px;
+}
+.flex-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px; 
+}
+    </style>
+  </head>
+  <body onload="onloadFunc()" style="background-color: white;">
+    <div class="converter-box">
+      <select id="measurer" class="sel convert">
+        <option value="volumeUnits">Volume</option>
+        <option value="massUnits">Mass</option>
+        <option value="temperatureUnits">Temperature</option>
+      </select>
+      <div class="flex-container">
+        <div>
+          <input id="input" class="selector">
+          <br>
+          <select id="inVolUnits" class="unit sel"></select>
+        </div>
+		 <div class="equals">=</div>
+        <div>
+          <input id="output" class="selector">
+          <br>
+          <select id="outVolUnits" class="unit sel"></select>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    let input = document.getElementById('input');
+    let measurer = document.getElementById('measurer');
+    let inVolUnits = document.getElementById('inVolUnits');
+    let outVolUnits = document.getElementById('outVolUnits');
+    let output = document.getElementById('output');
+
+    var oldval, oldval1, newval, newval1;
+
+    const volumeUnits = {
+      Mililiters: {
+        name: "Mililiters",
+        Mililiters(i){return (i / 1).toFixed(5);},
+        Liters(i){return (i / 1000).toFixed(5);},
+        Teaspoon(i){return (i/4.929).toFixed(5);},
+        Tablespoon(i){return (i / 14.787).toFixed(5)},
+        Fluid_oz(i){return (i / 29.574).toFixed(5)},
+        Cup(i){return (i / 240).toFixed(5);},
+        Pint(i){return (i / 473).toFixed(5);},
+        Quart(i){return (i / 946).toFixed(5);},
+        Gallon(i){return (i / 3785).toFixed(5);}
+      },
+      Liters: {
+        name: "Liters",
+        Mililiters(i){return (this.Liters(i) * 1000).toFixed(5);},
+        Liters(i){return (i / 1).toFixed(5);},
+        Teaspoon(i){return (i * 203).toFixed(5);},
+        Tablespoon(i){return (i * 67.628).toFixed(5)},
+        Fluid_oz(i){return (i * 33.814).toFixed(5)},
+        Cup(i){return (i * 4.167).toFixed(5);},
+        Pint(i){return (i * 2.113).toFixed(5);},
+        Quart(i){return (i * 1.057).toFixed(5);},
+        Gallon(i){return (i / 3.785).toFixed(5);}
+      }
+      // інші units лишаються без змін...
+    };
+
+    input.addEventListener('keyup', (e) => {
+      output.value = `${eval(measurer.value)[inVolUnits.value][outVolUnits.value](input.value)}`
+    });
+    output.addEventListener('keyup', (e) => {
+      input.value = `${eval(measurer.value)[outVolUnits.value][inVolUnits.value](output.value)}`
+    });
+    inVolUnits.addEventListener('change', (e) => {
+      newval1 = inVolUnits.value
+      if (newval1 == outVolUnits.value) {
+        outVolUnits.value = oldval1
+      }
+      input.value = `${eval(measurer.value)[outVolUnits.value][inVolUnits.value](output.value)}`
+    });
+    inVolUnits.addEventListener('mousedown', (e) => {
+      oldval1 = inVolUnits.value
+    });
+    outVolUnits.addEventListener('change', (e) => {
+      newval = outVolUnits.value
+      if (newval == inVolUnits.value) {
+        inVolUnits.value = oldval
+      }
+      output.value = `${eval(measurer.value)[inVolUnits.value][outVolUnits.value](input.value)}`
+    });
+    outVolUnits.addEventListener('mousedown', (e) => {
+      oldval = outVolUnits.value
+    });
+    measurer.addEventListener('change', (e) => {
+      inVolUnits.innerHTML = makeSelect()
+      outVolUnits.innerHTML = makeSelect()
+      while (inVolUnits.value == outVolUnits.value){
+        outVolUnits.innerHTML = makeSelect()
+      }
+      output.value = `${eval(measurer.value)[inVolUnits.value][outVolUnits.value](input.value)}`
+    });
+
+    function onloadFunc(){
+      inVolUnits.innerHTML = makeSelect()
+      outVolUnits.innerHTML = makeSelect()
+      while (inVolUnits.value == outVolUnits.value){
+        outVolUnits.innerHTML = makeSelect()
+      }
+      input.value = (1).toFixed(5)
+      output.value = `${eval(measurer.value)[inVolUnits.value][outVolUnits.value](input.value)}`
+    }
+    function makeSelect(){
+      var str = "";
+      size = Object.keys(eval(measurer.value)).length;
+      defaul = randomIntFromInterval(1,size);
+      var count = 0
+      for(var val in eval(measurer.value)){
+        if (count == defaul) {
+          str += "<option selected='selected' value=" + val + ">" + val + "</option>"
+        } else {
+          str += "<option value=" + val + ">" + eval(measurer.value)[val].name + "</option>"
+        }
+        count++
+      }
+      return str
+    }
+    function randomIntFromInterval(min, max) {
+      return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+  </script>
+</html>
