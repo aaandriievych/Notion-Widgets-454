@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triple Timer</title>
+<style>
+    body {
+        background-color: transparent;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+    }
+    .container {
+        display: flex;
+        gap: 15px; /* smaller gap */
+    }
+    .timer {
+        background-color: #fff7d1;
+        border-radius: 10px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        text-align: center;
+        width: 100px; /* reduced from 180px */
+    }
+    .timer input[type="text"] {
+        width: 90%;
+        padding: 3px;
+        margin-bottom: 8px;
+        font-size: 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        text-align: center;
+    }
+    .time-display {
+        font-size: 24px; /* reduced from 48px */
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+    .controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 8px;
+    }
+    button {
+        border: none;
+        padding: 4px 8px; /* smaller padding */
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px; /* smaller text */
+        background-color: #fff1a8;
+        transition: background 0.3s;
+    }
+    button:hover {
+        background-color: #ffe76a;
+    }
+    .cancel-btn {
+        display: block;
+        margin: 6px auto 0 auto;
+        width: 70%;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="timer">
+        <input type="text" placeholder="Timer 1">
+        <div class="time-display" id="time1">00:00</div>
+        <div class="controls">
+            <button onclick="changeTime(1, -10)">-</button>
+            <button onclick="startTimer(1)">Start</button>
+            <button onclick="changeTime(1, 10)">+</button>
+        </div>
+        <button class="cancel-btn" onclick="resetTimer(1)">Cancel</button>
+    </div>
+    <div class="timer">
+        <input type="text" placeholder="Timer 2">
+        <div class="time-display" id="time2">00:00</div>
+        <div class="controls">
+            <button onclick="changeTime(2, -10)">-</button>
+            <button onclick="startTimer(2)">Start</button>
+            <button onclick="changeTime(2, 10)">+</button>
+        </div>
+        <button class="cancel-btn" onclick="resetTimer(2)">Cancel</button>
+    </div>
+    <div class="timer">
+        <input type="text" placeholder="Timer 3">
+        <div class="time-display" id="time3">00:00</div>
+        <div class="controls">
+            <button onclick="changeTime(3, -10)">-</button>
+            <button onclick="startTimer(3)">Start</button>
+            <button onclick="changeTime(3, 10)">+</button>
+        </div>
+        <button class="cancel-btn" onclick="resetTimer(3)">Cancel</button>
+    </div>
+</div>
+
+<script>
+    const timers = [
+        { time: 0, interval: null },
+        { time: 0, interval: null },
+        { time: 0, interval: null }
+    ];
+
+    function updateDisplay(index) {
+        const minutes = String(Math.floor(timers[index].time / 60)).padStart(2, '0');
+        const seconds = String(timers[index].time % 60).padStart(2, '0');
+        document.getElementById(`time${index + 1}`).textContent = `${minutes}:${seconds}`;
+    }
+
+    function changeTime(timerNum, amount) {
+        const index = timerNum - 1;
+        timers[index].time = Math.max(0, timers[index].time + amount);
+        updateDisplay(index);
+    }
+
+    function startTimer(timerNum) {
+        const index = timerNum - 1;
+        if (timers[index].interval) return;
+        timers[index].interval = setInterval(() => {
+            if (timers[index].time > 0) {
+                timers[index].time--;
+                updateDisplay(index);
+            } else {
+                clearInterval(timers[index].interval);
+                timers[index].interval = null;
+                const inputBox = document.querySelectorAll('.timer input')[index];
+                const name = inputBox.value.trim() || `Timer ${timerNum}`;
+                alert(`${name} finished!`);
+            }
+        }, 1000);
+    }
+
+    function resetTimer(timerNum) {
+        const index = timerNum - 1;
+        clearInterval(timers[index].interval);
+        timers[index].interval = null;
+        timers[index].time = 0;
+        updateDisplay(index);
+    }
+</script>
+</body>
+</html>
