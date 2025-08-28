@@ -36,7 +36,7 @@
         text-align: center;
     }
     .time-display {
-        font-size: 36px;
+        font-size: 28px;
         font-weight: bold;
         margin-bottom: 8px;
     }
@@ -67,10 +67,15 @@
 </style>
 </head>
 <body>
+
+<audio id="alarm-sound">
+    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+</audio>
+
 <div class="container">
     <div class="timer">
         <input type="text" placeholder="Timer 1">
-        <div class="time-display" id="time1">00:00</div>
+        <div class="time-display" id="time1">00:00:00</div>
         <div class="controls">
             <button>-</button>
             <button onclick="startTimer(1)">Start</button>
@@ -80,7 +85,7 @@
     </div>
     <div class="timer">
         <input type="text" placeholder="Timer 2">
-        <div class="time-display" id="time2">00:00</div>
+        <div class="time-display" id="time2">00:00:00</div>
         <div class="controls">
             <button>-</button>
             <button onclick="startTimer(2)">Start</button>
@@ -90,7 +95,7 @@
     </div>
     <div class="timer">
         <input type="text" placeholder="Timer 3">
-        <div class="time-display" id="time3">00:00</div>
+        <div class="time-display" id="time3">00:00:00</div>
         <div class="controls">
             <button>-</button>
             <button onclick="startTimer(3)">Start</button>
@@ -102,14 +107,16 @@
 
 <script>
 (function() {
-  const timers = [0,0,0];          // seconds for each timer
+  const timers = [0,0,0];          
   const countdowns = [null,null,null];
   const holdIntervals = [null,null,null];
+  const alarmSound = document.getElementById('alarm-sound');
 
   function formatTime(t) {
-    const m = Math.floor(t/60);
+    const h = Math.floor(t/3600);
+    const m = Math.floor((t%3600)/60);
     const s = t%60;
-    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   }
 
   window.updateDisplay = function(index) {
@@ -135,7 +142,9 @@
         countdowns[idx]=null;
         const nameInput = document.querySelectorAll('.timer input')[idx];
         const name = (nameInput && nameInput.value.trim()) || `Timer ${index}`;
-        try{ alert(`${name} finished!`);}catch(e){}
+        alarmSound.currentTime = 0;
+        alarmSound.play();
+        alert(`${name} finished!`);
       }
     },1000);
   }
@@ -154,14 +163,14 @@
     const minusBtn = btns[0];
     const plusBtn = btns[2];
 
-    // прибираємо старі onclick
     minusBtn.removeAttribute('onclick');
     plusBtn.removeAttribute('onclick');
 
     function beginHold(amount){
-      changeTime(idx,amount); // одразу один крок
+      changeTime(idx,amount);
       if(holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i]=null; }
-      holdIntervals[i] = setInterval(()=>changeTime(idx,amount),150);
+      // швидший інтервал
+      holdIntervals[i] = setInterval(()=>changeTime(idx,amount),100);
       const stopHandler = ()=>{
         if(holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i]=null; }
         window.removeEventListener('pointerup', stopHandler);
@@ -174,7 +183,6 @@
     minusBtn.addEventListener('pointerdown', e=>{ e.preventDefault(); beginHold(-30); });
     plusBtn.addEventListener('pointerdown', e=>{ e.preventDefault(); beginHold(30); });
 
-    // одиночний клік теж додає/віднімає 30 секунд
     minusBtn.addEventListener('click', ()=>changeTime(idx,-30));
     plusBtn.addEventListener('click', ()=>changeTime(idx,30));
 
