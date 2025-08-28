@@ -99,56 +99,117 @@
         <button class="cancel-btn" onclick="resetTimer(3)">Cancel</button>
     </div>
 </div>
-
 <script>
-let timers = [0, 0, 0]; // seconds
-let intervals = [null, null, null];
-let changeInterval;
+(function() {
+  // state
+  const timers = [0, 0, 0];          // seconds for each timer
+  const countdowns = [null, null, null]; // countdown intervals
+  const holdIntervals = [null, null, null]; // hold intervals for +/- buttons
 
-function updateDisplay(index) {
-    const time = timers[index - 1];
-    const minutes = String(Math.floor(time / 60)).padStart(2, '0');
-    const seconds = String(time % 60).padStart(2, '0');
-    document.getElementById('time' + index).innerText = `${minutes}:${seconds}`;
-}
+  function formatTime(t) {
+    const m = Math.floor(t / 60);
+    const s = t % 60;
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
 
-function changeTime(index, amount) {
+  // update display for index (1-based)
+  window.updateDisplay = function(index) {
+    const elById = document.getElementById('time' + index);
+    let el = elById;
+    if (!el) {
+      const timersEls = document.querySelectorAll('.timer');
+      el = timersEls[index - 1] && timersEls[index - 1].querySelector('.time-display');
+    }
+    if (el) el.textContent = formatTime(timers[index - 1]);
+  };
+
+  // safe global functions (used by inline onclicks like Start / Cancel)
+  window.changeTime = function(index, amount) {
     timers[index - 1] = Math.max(0, timers[index - 1] + amount);
     updateDisplay(index);
-}
+  };
 
-function startTimer(index) {
-    if (intervals[index - 1]) return;
-    intervals[index - 1] = setInterval(() => {
-        if (timers[index - 1] > 0) {
-            timers[index - 1]--;
-            updateDisplay(index);
-        } else {
-            clearInterval(intervals[index - 1]);
-            intervals[index - 1] = null;
-            alert(`Timer ${index} finished!`);
-        }
+  window.startTimer = function(index) {
+    const idx = index - 1;
+    if (countdowns[idx]) return; // already running
+    if (timers[idx] <= 0) return; // nothing to run
+    countdowns[idx] = setInterval(() => {
+      if (timers[idx] > 0) {
+        timers[idx]--;
+        updateDisplay(index);
+      }
+      if (timers[idx] <= 0) {
+        clearInterval(countdowns[idx]);
+        countdowns[idx] = null;
+        // use the input name if present
+        const nameInput = document.querySelectorAll('.timer input')[idx];
+        const name = (nameInput && nameInput.value.trim()) || `Timer ${index}`;
+        try { alert(`${name} finished!`); } catch (e) { /* ignore */ }
+      }
     }, 1000);
-}
+  };
 
-function resetTimer(index) {
-    clearInterval(intervals[index - 1]);
-    intervals[index - 1] = null;
-    timers[index - 1] = 0;
+  window.resetTimer = function(index) {
+    const idx = index - 1;
+    if (countdowns[idx]) { clearInterval(countdowns[idx]); countdowns[idx] = null; }
+    timers[idx] = 0;
     updateDisplay(index);
-}
+  };
 
-// Continuous change on hold
-function startChanging(index, amount) {
-    changeTime(index, amount);
-    changeInterval = setInterval(() => {
-        changeTime(index, amount);
-    }, 200);
-}
+  // Attach hold (press-and-hold) handlers for +/- using pointer events.
+  // We remove inline onclick on plus/minus to avoid double-calls.
+  document.querySelectorAll('.timer').forEach((timerEl, i) => {
+    const idx = i + 1;
+    // controls layout expected: [ -, Start, + ]
+    const btns = timerEl.querySelectorAll('.controls button');
+    if (!btns || btns.length < 3) return;
+    const minusBtn = btns[0];
+    const startBtn = btns[1];
+    const plusBtn = btns[2];
+    // Remove any inline onclick on +/- to avoid duplicate calls (safe even if absent)
+    minusBtn.removeAttribute('onclick');
+    minusBtn.onclick = null;
+    plusBtn.removeAttribute('onclick');
+    plusBtn.onclick = null;
 
-function stopChanging() {
-    clearInterval(changeInterval);
-}
+    function beginHold(amount) {
+      // immediate one-step change (gives instant feedback)
+      changeTime(idx, amount);
+      // clear previous if any
+      if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
+      // start repeating
+      holdIntervals[i] = setInterval(() => changeTime(idx, amount), 150);
+
+      // ensure release anywhere stops it
+      const stopHandler = () => {
+        if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
+        window.removeEventListener('pointerup', stopHandler);
+        window.removeEventListener('pointercancel', stopHandler);
+      };
+      window.addEventListener('pointerup', stopHandler);
+      window.addEventListener('pointercancel', stopHandler);
+    }
+
+    // pointerdown is better than mousedown/touchstart because it unifies both
+    minusBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); beginHold(-10); });
+    plusBtn.addEventListener('pointerdown',  (e) => { e.preventDefault(); beginHold(10); });
+
+    // also stop if pointer leaves the button quickly (safety)
+    minusBtn.addEventListener('pointerleave', () => {
+      if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
+    });
+    plusBtn.addEventListener('pointerleave', () => {
+      if (holdIntervals[i]) { clearInterval(holdIntervals[i]); holdIntervals[i] = null; }
+    });
+
+    // Ensure display shows initial 00:00
+    updateDisplay(idx);
+  });
+
+  // initialize displays (in case)
+  updateDisplay(1); updateDisplay(2); updateDisplay(3);
+})();
 </script>
 </body>
 </html>
+
