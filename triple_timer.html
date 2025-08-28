@@ -16,7 +16,7 @@
     }
     .container {
         display: flex;
-        gap: 15px; /* smaller gap */
+        gap: 15px;
     }
     .timer {
         background-color: #fff7d1;
@@ -24,19 +24,19 @@
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         padding: 10px;
         text-align: center;
-        width: 100px; /* reduced from 180px */
+        width: 140px;
     }
     .timer input[type="text"] {
         width: 90%;
         padding: 3px;
         margin-bottom: 8px;
-        font-size: 12px;
+        font-size: 14px;
         border-radius: 6px;
         border: 1px solid #ccc;
         text-align: center;
     }
     .time-display {
-        font-size: 24px; /* reduced from 48px */
+        font-size: 36px;
         font-weight: bold;
         margin-bottom: 8px;
     }
@@ -49,10 +49,10 @@
     }
     button {
         border: none;
-        padding: 4px 8px; /* smaller padding */
+        padding: 6px 10px;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 12px; /* smaller text */
+        font-size: 14px;
         background-color: #fff1a8;
         transition: background 0.3s;
     }
@@ -72,9 +72,9 @@
         <input type="text" placeholder="Timer 1">
         <div class="time-display" id="time1">00:00</div>
         <div class="controls">
-            <button onclick="changeTime(1, -10)">-</button>
+            <button onmousedown="startChanging(1, -10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">-</button>
             <button onclick="startTimer(1)">Start</button>
-            <button onclick="changeTime(1, 10)">+</button>
+            <button onmousedown="startChanging(1, 10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">+</button>
         </div>
         <button class="cancel-btn" onclick="resetTimer(1)">Cancel</button>
     </div>
@@ -82,9 +82,9 @@
         <input type="text" placeholder="Timer 2">
         <div class="time-display" id="time2">00:00</div>
         <div class="controls">
-            <button onclick="changeTime(2, -10)">-</button>
+            <button onmousedown="startChanging(2, -10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">-</button>
             <button onclick="startTimer(2)">Start</button>
-            <button onclick="changeTime(2, 10)">+</button>
+            <button onmousedown="startChanging(2, 10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">+</button>
         </div>
         <button class="cancel-btn" onclick="resetTimer(2)">Cancel</button>
     </div>
@@ -92,91 +92,63 @@
         <input type="text" placeholder="Timer 3">
         <div class="time-display" id="time3">00:00</div>
         <div class="controls">
-            <button onclick="changeTime(3, -10)">-</button>
+            <button onmousedown="startChanging(3, -10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">-</button>
             <button onclick="startTimer(3)">Start</button>
-            <button onclick="changeTime(3, 10)">+</button>
+            <button onmousedown="startChanging(3, 10)" onmouseup="stopChanging()" onmouseleave="stopChanging()">+</button>
         </div>
         <button class="cancel-btn" onclick="resetTimer(3)">Cancel</button>
     </div>
 </div>
+
 <script>
-    document.querySelectorAll('.timer').forEach(timer => {
-        let intervalId;
-        const timeDisplay = timer.querySelector('.time-display');
-        const startBtn = timer.querySelector('.start');
-        const stopBtn = timer.querySelector('.stop');
-        const resetBtn = timer.querySelector('.reset');
-        const plusBtn = timer.querySelector('.plus');
-        const minusBtn = timer.querySelector('.minus');
-        let time = 0;
-        let countdown;
-        let running = false;
+let timers = [0, 0, 0]; // seconds
+let intervals = [null, null, null];
+let changeInterval;
 
-        function updateDisplay() {
-            const minutes = Math.floor(time / 60);
-            const seconds = time % 60;
-            timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+function updateDisplay(index) {
+    const time = timers[index - 1];
+    const minutes = String(Math.floor(time / 60)).padStart(2, '0');
+    const seconds = String(time % 60).padStart(2, '0');
+    document.getElementById('time' + index).innerText = `${minutes}:${seconds}`;
+}
+
+function changeTime(index, amount) {
+    timers[index - 1] = Math.max(0, timers[index - 1] + amount);
+    updateDisplay(index);
+}
+
+function startTimer(index) {
+    if (intervals[index - 1]) return;
+    intervals[index - 1] = setInterval(() => {
+        if (timers[index - 1] > 0) {
+            timers[index - 1]--;
+            updateDisplay(index);
+        } else {
+            clearInterval(intervals[index - 1]);
+            intervals[index - 1] = null;
+            alert(`Timer ${index} finished!`);
         }
+    }, 1000);
+}
 
-        function changeTime(amount) {
-            time = Math.max(0, time + amount);
-            updateDisplay();
-        }
+function resetTimer(index) {
+    clearInterval(intervals[index - 1]);
+    intervals[index - 1] = null;
+    timers[index - 1] = 0;
+    updateDisplay(index);
+}
 
-        function startChange(button, amount) {
-            changeTime(amount);
-            intervalId = setInterval(() => changeTime(amount), 150);
-        }
+// Continuous change on hold
+function startChanging(index, amount) {
+    changeTime(index, amount);
+    changeInterval = setInterval(() => {
+        changeTime(index, amount);
+    }, 200);
+}
 
-        function stopChange() {
-            clearInterval(intervalId);
-        }
-
-        // Buttons hold feature
-        plusBtn.addEventListener('mousedown', () => startChange(plusBtn, 10));
-        plusBtn.addEventListener('mouseup', stopChange);
-        plusBtn.addEventListener('mouseleave', stopChange);
-
-        minusBtn.addEventListener('mousedown', () => startChange(minusBtn, -10));
-        minusBtn.addEventListener('mouseup', stopChange);
-        minusBtn.addEventListener('mouseleave', stopChange);
-
-        // Mobile touch support
-        plusBtn.addEventListener('touchstart', e => { e.preventDefault(); startChange(plusBtn, 10); });
-        plusBtn.addEventListener('touchend', stopChange);
-
-        minusBtn.addEventListener('touchstart', e => { e.preventDefault(); startChange(minusBtn, -10); });
-        minusBtn.addEventListener('touchend', stopChange);
-
-        // Start/Stop/Reset
-        startBtn.addEventListener('click', () => {
-            if (!running && time > 0) {
-                running = true;
-                countdown = setInterval(() => {
-                    time--;
-                    updateDisplay();
-                    if (time <= 0) {
-                        clearInterval(countdown);
-                        running = false;
-                    }
-                }, 1000);
-            }
-        });
-
-        stopBtn.addEventListener('click', () => {
-            clearInterval(countdown);
-            running = false;
-        });
-
-        resetBtn.addEventListener('click', () => {
-            clearInterval(countdown);
-            running = false;
-            time = 0;
-            updateDisplay();
-        });
-
-        updateDisplay();
-    });
+function stopChanging() {
+    clearInterval(changeInterval);
+}
 </script>
 </body>
 </html>
