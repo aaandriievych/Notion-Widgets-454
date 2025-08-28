@@ -3,166 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multiple Timers</title>
+<title>Triple Timer</title>
 <style>
     body {
+        background-color: transparent;
         font-family: Arial, sans-serif;
-        background: #fafafa;
         display: flex;
         justify-content: center;
         align-items: center;
-        flex-direction: column;
-        gap: 30px;
-        padding: 40px;
+        min-height: 100vh;
+        margin: 0;
     }
-
+    .container {
+        display: flex;
+        gap: 40px; /* more space between timers */
+    }
     .timer {
-        background: white;
-        padding: 25px;
+        background-color: #fff7d1;
         border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 25px;
         text-align: center;
-        width: 400px;
+        width: 200px; /* bigger width */
     }
-
+    .timer input[type="text"] {
+        width: 90%;
+        padding: 10px;
+        margin-bottom: 15px;
+        font-size: 18px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        text-align: center;
+    }
     .time-display {
-        font-size: 64px;
-        margin-bottom: 25px;
+        font-size: 56px; /* bigger than before */
         font-weight: bold;
+        margin-bottom: 20px;
     }
-
     .controls {
         display: flex;
         justify-content: center;
+        align-items: center;
         gap: 12px;
-        flex-wrap: wrap;
+        margin-bottom: 20px;
     }
-
     button {
-        font-size: 22px;
-        padding: 15px 28px;
         border: none;
+        padding: 12px 18px; /* bigger buttons */
         border-radius: 10px;
         cursor: pointer;
-        background-color: #333;
-        color: white;
+        font-size: 18px;
+        background-color: #fff1a8;
         transition: background 0.3s;
     }
-
     button:hover {
-        background-color: #555;
+        background-color: #ffe76a;
     }
-
-    .plus, .minus {
-        background-color: #007bff;
-    }
-
-    .plus:hover, .minus:hover {
-        background-color: #0056b3;
+    .cancel-btn {
+        display: block;
+        margin: 12px auto 0 auto;
+        width: 90%;
+        font-size: 18px;
+        padding: 12px;
     }
 </style>
 </head>
 <body>
+<div class="container">
     <div class="timer">
-        <div class="time-display">00:00</div>
+        <input type="text" placeholder="Timer 1">
+        <div class="time-display" id="time1">00:00</div>
         <div class="controls">
-            <button class="minus">-</button>
-            <button class="plus">+</button>
-            <button class="start">Start</button>
-            <button class="stop">Stop</button>
-            <button class="reset">Reset</button>
+            <button onclick="changeTime(1, -10)">-</button>
+            <button onclick="startTimer(1)">Start</button>
+            <button onclick="changeTime(1, 10)">+</button>
         </div>
+        <button class="cancel-btn" onclick="resetTimer(1)">Cancel</button>
     </div>
-
     <div class="timer">
-        <div class="time-display">00:00</div>
+        <input type="text" placeholder="Timer 2">
+        <div class="time-display" id="time2">00:00</div>
         <div class="controls">
-            <button class="minus">-</button>
-            <button class="plus">+</button>
-            <button class="start">Start</button>
-            <button class="stop">Stop</button>
-            <button class="reset">Reset</button>
+            <button onclick="changeTime(2, -10)">-</button>
+            <button onclick="startTimer(2)">Start</button>
+            <button onclick="changeTime(2, 10)">+</button>
         </div>
+        <button class="cancel-btn" onclick="resetTimer(2)">Cancel</button>
     </div>
+    <div class="timer">
+        <input type="text" placeholder="Timer 3">
+        <div class="time-display" id="time3">00:00</div>
+        <div class="controls">
+            <button onclick="changeTime(3, -10)">-</button>
+            <button onclick="startTimer(3)">Start</button>
+            <button onclick="changeTime(3, 10)">+</button>
+        </div>
+        <button class="cancel-btn" onclick="resetTimer(3)">Cancel</button>
+    </div>
+</div>
+<script>
+    document.querySelectorAll('.timer').forEach(timer => {
+        let intervalId;
+        const timeDisplay = timer.querySelector('.time-display');
+        const startBtn = timer.querySelector('.start');
+        const stopBtn = timer.querySelector('.stop');
+        const resetBtn = timer.querySelector('.reset');
+        const plusBtn = timer.querySelector('.plus');
+        const minusBtn = timer.querySelector('.minus');
+        let time = 0;
+        let countdown;
+        let running = false;
 
-    <script>
-        document.querySelectorAll('.timer').forEach(timer => {
-            let intervalId;
-            const timeDisplay = timer.querySelector('.time-display');
-            const startBtn = timer.querySelector('.start');
-            const stopBtn = timer.querySelector('.stop');
-            const resetBtn = timer.querySelector('.reset');
-            const plusBtn = timer.querySelector('.plus');
-            const minusBtn = timer.querySelector('.minus');
-            let time = 0;
-            let countdown;
-            let running = false;
+        function updateDisplay() {
+            const minutes = Math.floor(time / 60);
+            const seconds = time % 60;
+            timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
 
-            function updateDisplay() {
-                const minutes = Math.floor(time / 60);
-                const seconds = time % 60;
-                timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        function changeTime(amount) {
+            time = Math.max(0, time + amount);
+            updateDisplay();
+        }
+
+        function startChange(button, amount) {
+            changeTime(amount);
+            intervalId = setInterval(() => changeTime(amount), 150);
+        }
+
+        function stopChange() {
+            clearInterval(intervalId);
+        }
+
+        // Buttons hold feature
+        plusBtn.addEventListener('mousedown', () => startChange(plusBtn, 10));
+        plusBtn.addEventListener('mouseup', stopChange);
+        plusBtn.addEventListener('mouseleave', stopChange);
+
+        minusBtn.addEventListener('mousedown', () => startChange(minusBtn, -10));
+        minusBtn.addEventListener('mouseup', stopChange);
+        minusBtn.addEventListener('mouseleave', stopChange);
+
+        // Mobile touch support
+        plusBtn.addEventListener('touchstart', e => { e.preventDefault(); startChange(plusBtn, 10); });
+        plusBtn.addEventListener('touchend', stopChange);
+
+        minusBtn.addEventListener('touchstart', e => { e.preventDefault(); startChange(minusBtn, -10); });
+        minusBtn.addEventListener('touchend', stopChange);
+
+        // Start/Stop/Reset
+        startBtn.addEventListener('click', () => {
+            if (!running && time > 0) {
+                running = true;
+                countdown = setInterval(() => {
+                    time--;
+                    updateDisplay();
+                    if (time <= 0) {
+                        clearInterval(countdown);
+                        running = false;
+                    }
+                }, 1000);
             }
+        });
 
-            function changeTime(amount) {
-                time = Math.max(0, time + amount);
-                updateDisplay();
-            }
+        stopBtn.addEventListener('click', () => {
+            clearInterval(countdown);
+            running = false;
+        });
 
-            function startChange(amount) {
-                changeTime(amount);
-                intervalId = setInterval(() => changeTime(amount), 150);
-            }
-
-            function stopChange() {
-                clearInterval(intervalId);
-            }
-
-            // Hold to increase/decrease
-            plusBtn.addEventListener('mousedown', () => startChange(10));
-            plusBtn.addEventListener('mouseup', stopChange);
-            plusBtn.addEventListener('mouseleave', stopChange);
-
-            minusBtn.addEventListener('mousedown', () => startChange(-10));
-            minusBtn.addEventListener('mouseup', stopChange);
-            minusBtn.addEventListener('mouseleave', stopChange);
-
-            // Mobile touch support
-            plusBtn.addEventListener('touchstart', e => { e.preventDefault(); startChange(10); });
-            plusBtn.addEventListener('touchend', stopChange);
-
-            minusBtn.addEventListener('touchstart', e => { e.preventDefault(); startChange(-10); });
-            minusBtn.addEventListener('touchend', stopChange);
-
-            // Start/Stop/Reset
-            startBtn.addEventListener('click', () => {
-                if (!running && time > 0) {
-                    running = true;
-                    countdown = setInterval(() => {
-                        time--;
-                        updateDisplay();
-                        if (time <= 0) {
-                            clearInterval(countdown);
-                            running = false;
-                        }
-                    }, 1000);
-                }
-            });
-
-            stopBtn.addEventListener('click', () => {
-                clearInterval(countdown);
-                running = false;
-            });
-
-            resetBtn.addEventListener('click', () => {
-                clearInterval(countdown);
-                running = false;
-                time = 0;
-                updateDisplay();
-            });
-
+        resetBtn.addEventListener('click', () => {
+            clearInterval(countdown);
+            running = false;
+            time = 0;
             updateDisplay();
         });
-    </script>
+
+        updateDisplay();
+    });
+</script>
 </body>
 </html>
