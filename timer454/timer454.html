@@ -9,6 +9,7 @@
 <style>
   body {
     font-family: Helvetica, sans-serif;
+    background-color: #d4f7d4;
     color: black;
     display: flex;
     align-items: center;
@@ -16,19 +17,16 @@
     height: 100vh;
     margin: 0;
   }
-#fit-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
+
   .timer-container {
-    border: 2px solid black;   
-    border-radius: 15px;       
+    border: 2px solid black;   /* чорний контур */
+    border-radius: 15px;       /* скруглені кути */
     padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     background-color: #d4f7d4;
+     transform: scale(0.4);
   }
 
   .top-buttons, .bottom-buttons {
@@ -61,7 +59,7 @@
   <audio id="alarmSound" src="new-notification-022.mp3" preload="auto"></audio>
 
   <div class="top-buttons">
-    <button onclick="setTimer(5)">Short Break</button> <!-- 10 секунд -->
+    <button onclick="setTimer(5)">Short Break</button> 
     <button onclick="setTimer(25)">Focus</button>
     <button onclick="setTimer(30)">Long Break</button>
   </div>
@@ -110,31 +108,9 @@
     totalSeconds = 25 * 60;
     updateDisplay();
   }
-function applyAutoScale() {
-    const base = document.getElementById('timerBase');
-    const wrapper = document.getElementById('fit-wrapper');
- base.style.transform = 'none';
-    base.style.transformOrigin = 'top left';
-  const bw = base.offsetWidth;
-    const bh = base.offsetHeight;
-  const ww = wrapper.clientWidth || window.innerWidth;
-    const scale = ww / bw;
-   base.style.transform = `scale(${scale})`;
-   wrapper.style.height = (bh * scale) + 'px';
-  }
 
-  window.addEventListener('load', () => {
-    updateDisplay();
-    applyAutoScale();
-    setTimeout(applyAutoScale, 50);
-    setTimeout(applyAutoScale, 250);
-  });
-  window.addEventListener('resize', applyAutoScale);
-
+  updateDisplay();
 </script>
 
 </body>
 </html>
-
-
-
