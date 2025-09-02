@@ -12,8 +12,6 @@ const resetBtn = document.getElementById('reset-btn');
 const pomodoroIntervalBtn = document.getElementById('pomodoro-interval-btn');
 const shortBreakIntervalBtn = document.getElementById('short-break-interval-btn');
 const longBreakIntervalBtn = document.getElementById('long-break-interval-btn');
-const settingsBtn = document.getElementById('settings-btn');
-const settingsModal = document.getElementById('settings-modal');
 const closeModalBtn = document.querySelector('.close-btn');
 const backgroundColorSelect = document.getElementById('background-color');
 const fontColorSelect = document.getElementById('font-color');
@@ -61,33 +59,6 @@ resetBtn.addEventListener('click', () => {
   updateTimeLeftTextContent();
   startStopBtn.textContent = 'Start';
 });
-
-// Event listener for settings button
-settingsBtn.addEventListener('click', () => {
-  settingsModal.style.display = 'flex';
-});
-
-// Event listener for close button in the settings modal
-closeModalBtn.addEventListener('click', () => {
-  settingsModal.style.display = 'none';
-});
-
-// Event listener for save button in the settings modal
-saveBtn.addEventListener('click', () => {
-  const newBackgroundColor = backgroundColorSelect.value;
-  const newFontColor = fontColorSelect.value;
-
-  // Save preferences to localStorage
-  localStorage.setItem('backgroundColor', newBackgroundColor);
-  localStorage.setItem('fontColor', newFontColor);
-
-  // Apply the new saved preferences
-  applyUserPreferences();
-
-  // Close the modal after saving preferences
-  settingsModal.style.display = 'none';
-});
-
 // Function to start the timer
 function startTimer() {
   timerInterval = setInterval(() => {
@@ -153,4 +124,5 @@ function applyUserPreferences() {
 }
 
 // Apply user preferences on page load
+
 applyUserPreferences();
