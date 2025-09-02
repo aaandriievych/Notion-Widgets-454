@@ -16,7 +16,11 @@
     height: 100vh;
     margin: 0;
   }
-
+#fit-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
   .timer-container {
     border: 2px solid black;   
     border-radius: 15px;       
@@ -25,8 +29,6 @@
     flex-direction: column;
     align-items: center;
     background-color: #d4f7d4;
-    transform: scale(0.8);
-    transform-origin: top left;
   }
 
   .top-buttons, .bottom-buttons {
@@ -108,11 +110,31 @@
     totalSeconds = 25 * 60;
     updateDisplay();
   }
+function applyAutoScale() {
+    const base = document.getElementById('timerBase');
+    const wrapper = document.getElementById('fit-wrapper');
+ base.style.transform = 'none';
+    base.style.transformOrigin = 'top left';
+  const bw = base.offsetWidth;
+    const bh = base.offsetHeight;
+  const ww = wrapper.clientWidth || window.innerWidth;
+    const scale = ww / bw;
+   base.style.transform = `scale(${scale})`;
+   wrapper.style.height = (bh * scale) + 'px';
+  }
 
-  updateDisplay();
+  window.addEventListener('load', () => {
+    updateDisplay();
+    applyAutoScale();
+    setTimeout(applyAutoScale, 50);
+    setTimeout(applyAutoScale, 250);
+  });
+  window.addEventListener('resize', applyAutoScale);
+
 </script>
 
 </body>
 </html>
+
 
 
