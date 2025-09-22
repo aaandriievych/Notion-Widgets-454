@@ -5,32 +5,35 @@
 }
 
 body {
-font-family: 'Inter', sans-serif;
   display: flex;
-  padding: 0;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #fff; 
+  font-family: 'Inter', sans-serif;
+  background: #fff; /* сторінка біла */
 }
 
 .calculator {
-  position: relative;
   display: grid;
   background: #FCFCFC; /* фон калькулятора */
   padding: 10px;
   border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* тінь */
+  grid-template-columns: repeat(4, 60px); /* менше */
+  grid-auto-rows: 60px;
+  gap: 6px;
 }
 
 .calculator .value {
   grid-column: span 4;
-  height: 60px; 
- border: 2px solid #ccc;
+  height: 50px; /* менше по висоті */
   text-align: right;
- border-radius: 10px;
-  padding: 10px;
-  font-size: 18px;
-  color: #000; 
+  border: 2px solid #ccc; /* сірий контур постійно */
+  border-radius: 6px;
+  outline: none;
+  padding: 5px 10px;
+  font-size: 16px;
+  color: #000;
   background: #FCFCFC;
 }
 
@@ -38,32 +41,34 @@ font-family: 'Inter', sans-serif;
   display: grid;
   width: 60px;
   height: 60px;
-  background: #FCFCFC; /* кнопки теж білий/світлий */
+  background: #FCFCFC; /* кнопки білий фон */
   place-items: center;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  color: #000; /* чорний текст на кнопках */
+  border: 2px solid #ccc; /* сірий контур кнопок */
+  color: #000;
   cursor: pointer;
   font-weight: bold;
+  border-radius: 6px;
 }
 
 .calculator span:active {
-  background: #F5EDE9; /* замінили помаранчеве на твоє */
+  background: #F5EDE9; /* помаранчеве при натисканні */
   color: #000;
 }
 
 .calculator span.clear {
   grid-column: span 2;
-  width: 120px;
-  background: #F5EDE9; /* помаранчеве поле */
+  width: 126px; /* span 2 + gap */
+  background: #F5EDE9;
   color: #000;
 }
 
 .calculator span.plus {
   grid-row: span 2;
-  height: 120px;
+  height: 126px; /* span 2 + gap */
 }
 
 .calculator span.equal {
-  background: #F5EDE9; /* помаранчеве */
+  background: #F5EDE9;
   color: #000;
 }
+
