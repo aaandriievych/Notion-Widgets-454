@@ -2,7 +2,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: sans-serif;
 }
 
 body {
@@ -11,43 +10,51 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #000;
+  background: #fff; /* сторінка біла */
 }
 
 .calculator {
   position: relative;
   display: grid;
+  background: #FCFCFC; /* фон калькулятора */
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .calculator .value {
   grid-column: span 4;
-  height: 100px;
+  height: 60px; /* зменшили висоту */
   text-align: right;
   border: none;
   outline: none;
   padding: 10px;
   font-size: 18px;
+  color: #000; /* чорний текст */
+  background: #FCFCFC;
 }
 
 .calculator span {
   display: grid;
   width: 60px;
   height: 60px;
-  background: #FCFCFC;
+  background: #FCFCFC; /* кнопки теж білий/світлий */
   place-items: center;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  color: #fff;
+  color: #000; /* чорний текст на кнопках */
+  cursor: pointer;
+  font-weight: bold;
 }
 
 .calculator span:active {
-  background: rgb(255, 163, 26);
-  color: #fff;
+  background: #F5EDE9; /* замінили помаранчеве на твоє */
+  color: #000;
 }
 
 .calculator span.clear {
   grid-column: span 2;
   width: 120px;
-  background: rgb(255, 163, 26);
+  background: #F5EDE9; /* помаранчеве поле */
+  color: #000;
 }
 
 .calculator span.plus {
@@ -56,6 +63,6 @@ body {
 }
 
 .calculator span.equal {
-  background: rgb(255, 163, 26);
-  /* background: #03b1ff; */
+  background: #F5EDE9; /* помаранчеве */
+  color: #000;
 }
