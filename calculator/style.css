@@ -7,10 +7,11 @@
 
 body {
   display: flex;
+  padding: 0;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #1b1b1b;
+  background: #000;
 }
 
 .calculator {
@@ -32,7 +33,7 @@ body {
   display: grid;
   width: 60px;
   height: 60px;
-  background: #292929;
+  background: #FCFCFC;
   place-items: center;
   border: 1px solid rgba(0, 0, 0, 0.1);
   color: #fff;
@@ -47,7 +48,6 @@ body {
   grid-column: span 2;
   width: 120px;
   background: rgb(255, 163, 26);
-  /* color: #fff; */
 }
 
 .calculator span.plus {
