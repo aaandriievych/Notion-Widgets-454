@@ -9,33 +9,33 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  font-family: 'Inter', sans-serif;
-  background: #fff; /* сторінка біла */
+  background: #fff;
 }
 
 .calculator {
   display: grid;
-  background: #FCFCFC; /* фон калькулятора */
+  background: #FCFCFC;
   padding: 10px;
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* тінь */
-  grid-template-columns: repeat(4, 50px); /* менше по ширині */
-  grid-auto-rows: 50px; /* менше по висоті */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  grid-template-columns: repeat(4, 50px); /* менша ширина */
+  grid-auto-rows: 60px;
   gap: 6px;
 }
 
 .calculator .value {
   grid-column: span 4;
-  height: 45px;
+  height: 50px; /* менше по висоті */
   text-align: right;
-  border: 2px solid #ccc; /* сірий контур постійно */
+  border: 2px solid #ccc;
   border-radius: 6px;
   outline: none;
-  padding: 5px 10px;
+  padding: 5px 8px;
   font-size: 16px;
   color: #000;
   background: #FCFCFC;
 }
+
 
 .calculator span {
   display: grid;
