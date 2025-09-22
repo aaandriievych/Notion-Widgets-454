@@ -5,6 +5,7 @@
 }
 
 body {
+font-family: 'Inter', sans-serif;
   display: flex;
   padding: 0;
   justify-content: center;
@@ -26,7 +27,7 @@ body {
   height: 60px; /* зменшили висоту */
   text-align: right;
   border: none;
-  outline: none;
+  outline: 1px solid rgba(0, 0, 0, 0.1);;
   padding: 10px;
   font-size: 18px;
   color: #000; /* чорний текст */
