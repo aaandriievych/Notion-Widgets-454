@@ -11,7 +11,7 @@ font-family: 'Inter', sans-serif;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #fff; /* сторінка біла */
+  background: #fff; 
 }
 
 .calculator {
@@ -24,13 +24,13 @@ font-family: 'Inter', sans-serif;
 
 .calculator .value {
   grid-column: span 4;
-  height: 60px; /* зменшили висоту */
+  height: 60px; 
+ border: 2px solid #ccc;
   text-align: right;
   border: none;
-  outline: 1px solid rgba(0, 0, 0, 0.1);;
   padding: 10px;
   font-size: 18px;
-  color: #000; /* чорний текст */
+  color: #000; 
   background: #FCFCFC;
 }
 
