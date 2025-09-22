@@ -19,14 +19,14 @@ body {
   padding: 10px;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* тінь */
-  grid-template-columns: repeat(4, 60px); /* менше */
-  grid-auto-rows: 60px;
+  grid-template-columns: repeat(4, 50px); /* менше по ширині */
+  grid-auto-rows: 50px; /* менше по висоті */
   gap: 6px;
 }
 
 .calculator .value {
   grid-column: span 4;
-  height: 50px; /* менше по висоті */
+  height: 45px;
   text-align: right;
   border: 2px solid #ccc; /* сірий контур постійно */
   border-radius: 6px;
@@ -56,15 +56,16 @@ body {
 }
 
 .calculator span.clear {
+width: 105px;
   grid-column: span 2;
-  width: 126px; /* span 2 + gap */
+  width: 105px;
   background: #F5EDE9;
   color: #000;
 }
 
 .calculator span.plus {
   grid-row: span 2;
-  height: 126px; /* span 2 + gap */
+   height: 105px;
 }
 
 .calculator span.equal {
