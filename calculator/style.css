@@ -27,7 +27,7 @@ font-family: 'Inter', sans-serif;
   height: 60px; 
  border: 2px solid #ccc;
   text-align: right;
-  border: none;
+ border-radius: 10px;
   padding: 10px;
   font-size: 18px;
   color: #000; 
